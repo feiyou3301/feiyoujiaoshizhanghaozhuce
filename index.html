@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞友教师账号注册</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        body{
+            background: #e8f2ff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding:20px;
+        }
+        .reg-box{
+            background:#ffffff;
+            width:100%;
+            max-width:460px;
+            padding:32px 28px;
+            border-radius:16px;
+            box-shadow:0 4px 16px rgba(22,93,255,0.12);
+        }
+        h1{
+            text-align:center;
+            color:#165DFF;
+            margin-bottom:26px;
+            font-size:22px;
+        }
+        .tip{
+            font-size:14px;
+            color:#666;
+            margin-bottom:20px;
+            text-align:center;
+        }
+        .form-item{
+            margin-bottom:18px;
+        }
+        label{
+            display:block;
+            margin-bottom:6px;
+            color:#333;
+            font-size:15px;
+        }
+        input{
+            width:100%;
+            padding:12px 14px;
+            border:1px solid #d0d7e3;
+            border-radius:10px;
+            font-size:15px;
+        }
+        input:read-only{
+            background:#f4f7fc;
+            color:#444;
+        }
+        button{
+            width:100%;
+            padding:13px;
+            background:#165DFF;
+            color:white;
+            border:none;
+            border-radius:10px;
+            font-size:16px;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        button:hover{
+            background:#0e4bd0;
+        }
+        .result{
+            margin-top:22px;
+            padding:16px;
+            background:#f0f6ff;
+            border-radius:10px;
+            display:none;
+        }
+        .result h3{
+            color:#165DFF;
+            margin-bottom:10px;
+            font-size:16px;
+        }
+        .line{
+            margin:8px 0;
+            font-size:15px;
+        }
+        .bottom-note{
+            margin-top:18px;
+            text-align:center;
+            font-size:14px;
+            color:#555;
+        }
+    </style>
+</head>
+<body>
+<div class="reg-box">
+    <h1>✈️ 飞友教师注册</h1>
+    <p class="tip">仅支持QQ邮箱注册，邮箱后缀保持不变，系统自动生成账号、教师编码与密码</p>
+
+    <div class="form-item">
+        <label>QQ邮箱</label>
+        <input type="email" id="qqMail" placeholder="请输入完整QQ邮箱，例：123456@qq.com">
+    </div>
+
+    <div class="form-item">
+        <label>教师编码（自动生成，FY001起始递增）</label>
+        <input type="text" id="teacherCode" readonly placeholder="注册后生成">
+    </div>
+
+    <div class="form-item">
+        <label>自动生成教师账号</label>
+        <input type="text" id="teaAccount" readonly placeholder="注册后生成">
+    </div>
+
+    <div class="form-item">
+        <label>自动生成登录密码</label>
+        <input type="text" id="teaPwd" readonly placeholder="注册后生成">
+    </div>
+
+    <button onclick="doRegister()">完成注册，生成账号密码</button>
+
+    <div class="result" id="resBlock">
+        <h3>✅ 注册成功，请保存信息</h3>
+        <div class="line">绑定邮箱：<span id="showMail"></span></div>
+        <div class="line">教师编码：<span id="showCode"></span></div>
+        <div class="line">教师账号：<span id="showAcc"></span></div>
+        <div class="line">登录密码：<span id="showPwd"></span></div>
+    </div>
+    <div class="bottom-note">注：登录邮箱选您刚刚注册的邮箱账号即可</div>
+</div>
+
+<script>
+function randomPass(len=8){
+    const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let str='';
+    for(let i=0;i<len;i++){
+        str += chars[Math.floor(Math.random()*chars.length)];
+    }
+    return str;
+}
+
+//重置计数，强制从 FY001 开始
+function getNextTeacherCode(){
+    return "FY001";
+}
+
+function doRegister(){
+    const mail = document.getElementById('qqMail').value.trim();
+    const mailRule = /^[1-9]\d{4,11}@qq\.com$/;
+    if(!mailRule.test(mail)){
+        alert('请输入合法完整QQ邮箱（xxx@qq.com）');
+        return;
+    }
+    const qqNum = mail.split('@')[0];
+    const teaAcc = "FY_"+qqNum;
+    const teaPwd = randomPass(8);
+    const teaCode = getNextTeacherCode();
+
+    document.getElementById('teacherCode').value = teaCode;
+    document.getElementById('teaAccount').value = teaAcc;
+    document.getElementById('teaPwd').value = teaPwd;
+
+    document.getElementById('showMail').innerText = mail;
+    document.getElementById('showCode').innerText = teaCode;
+    document.getElementById('showAcc').innerText = teaAcc;
+    document.getElementById('showPwd').innerText = teaPwd;
+    document.getElementById('resBlock').style.display = "block";
+
+    let list = JSON.parse(localStorage.getItem("flyTeacherReg")) || [];
+    list.push({email:mail,teacherCode:teaCode,account:teaAcc,password:teaPwd});
+    localStorage.setItem("flyTeacherReg",JSON.stringify(list));
+}
+</script>
+</body>
+</html>
