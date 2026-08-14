@@ -144,9 +144,10 @@ function randomPass(len=8){
     return str;
 }
 
-//重置计数，强制从 FY001 开始
 function getNextTeacherCode(){
-    return "FY001";
+    let count = Number(localStorage.getItem("fyCount")) || 1;
+    localStorage.setItem("fyCount", count + 1);
+    return "FY" + String(count).padStart(3,"0");
 }
 
 function doRegister(){
@@ -157,7 +158,7 @@ function doRegister(){
         return;
     }
     const qqNum = mail.split('@')[0];
-    const teaAcc = "FY_"+qqNum;
+    const teaAcc = "fy_"+qqNum;
     const teaPwd = randomPass(8);
     const teaCode = getNextTeacherCode();
 
